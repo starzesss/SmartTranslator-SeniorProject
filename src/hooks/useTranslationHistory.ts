@@ -32,6 +32,21 @@ function loadHistory(): TranslationRecord[] {
   }
 }
 
+function generateId(): string {
+  if (typeof window !== "undefined" && window.crypto && typeof window.crypto.randomUUID === "function") {
+    try {
+      return window.crypto.randomUUID();
+    } catch {
+      
+    }
+  }
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
 export function useTranslationHistory() {
   const [history, setHistory] = useState<TranslationRecord[]>(loadHistory);
 
@@ -42,7 +57,7 @@ export function useTranslationHistory() {
   const addRecord = useCallback((record: Omit<TranslationRecord, "id" | "timestamp" | "wordCount">) => {
     const newRecord: TranslationRecord = {
       ...record,
-      id: crypto.randomUUID(),
+      id: generateId(),
       timestamp: Date.now(),
       wordCount: record.input.trim().split(/\s+/).filter(Boolean).length,
     };
